@@ -1,0 +1,35 @@
+<app-progress-bar *ngIf="loading"></app-progress-bar>
+
+
+<div *ngIf="!loading" class="container">
+    <div class="title">
+        <h4>Listado de productos </h4>
+        <button type="button" class="btn btn-primary" routerLink="/add">Agregar producto</button>
+    </div>
+    <table class="table table-hover">
+        <thead>
+          <tr>
+            <th scope="col" _msttexthash="46098" _msthash="236">Nombre</th>
+            <th scope="col" _msttexthash="412971" _msthash="237">Descripcion</th>
+            <th scope="col" _msttexthash="412971" _msthash="238">Precio </th>
+            <th scope="col" _msttexthash="412971" _msthash="239">stock</th>
+            <th scope="col" _msttexthash="412971" _msthash="239"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of listProducts" class="table-active">
+            <td>{{item.name}}</td>
+            <td _msttexthash="451594" _msthash="241">{{item.description}}</td>
+            <td _msttexthash="451594" _msthash="242">{{item.price}}</td>
+            <td _msttexthash="451594" _msthash="243">{{item.stock}}</td>
+            <td _msttexthash="451594" _msthash="243">
+
+               <button routerLink="/edit/{{item.id}}" class="btn btn-info btn-sm" _msttexthash="256607" _msthash="159">edit </button>
+               <button (click)="deleteProduct(item.id!)" class="btn btn-secondary btn-sm ms-2" _msttexthash="256607" _msthash="159" >delete </button>
+    
+            </td>
+          </tr>
+        </tbody>
+    </table>
+</div>
+
