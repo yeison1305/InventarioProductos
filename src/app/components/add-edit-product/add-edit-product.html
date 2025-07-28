@@ -1,36 +1,248 @@
-<div class="row">
-    <div class="col-lg-4 offset-lg-4">
-        <div class="card text-white bg-secondary mb-3" style="max-width: 30rem;">
-            <div class="card-header text-center">{{operacion}} producto</div>
-            <div class="card-body">
-                <form [formGroup]="form" (ngSubmit)="addproduct()">
-                    <input formControlName="name" type="text" class="form-control mt-2" placeholder="Nombre del producto" aria-label="Nombre del producto">
-                    <span *ngIf="form.get('name')?.hasError('required') && form.get('name')?.touched" > 
-                        el campo nombre <strong>es obligatorio</strong>
-                    </span>
-                    <input formControlName="description" type="text" class="form-control mt-2" placeholder="Descripción del producto" aria-label="Descripción del producto">
-                    <span *ngIf="form.get('description')?.hasError('required') && form.get('description')?.touched" >
-                        el campo descripcion <strong>es obligatorio</strong>
-                    </span>
-                    <input formControlName="price" type="number" class="form-control mt-2" placeholder="Precio del producto" aria-label="Precio del producto">
-                    <span *ngIf="form.get('price')?.hasError('required') && form.get('price')?.touched" >
-                        el campo precio <strong>es obligatorio</strong>
-                    </span>
-                    <input formControlName="stock" type="number" class="form-control mt-2" placeholder="Cantidad del producto" aria-label="Cantidad del producto">
-                    <span *ngIf="form.get('stock')?.hasError('required') && form.get('stock')?.touched" >
-                        el campo stock <strong>es obligatorio</strong>
-                    </span>
-                    <div class="row mt-2 text-center">
-                        <div class="col-lg-4">
-                            <button type="submit" class="btn btn-primary" [disabled]="form.invalid">Aceptar</button>
-                        </div>
-                        <div class="col-lg-4">
-                            <button routerLink="/" type="button" class="btn btn-secondary">Volver</button>
-                        </div>
-                    </div> 
-                </form>       
-            </div>
-        </div>
-    </div> 
-</div>
+<div class="container mt-5">
+  <h3>{{ operacion }} producto</h3>
+  <form [formGroup]="form" (ngSubmit)="addProduct()">
+    <div class="mb-3">
+      <label for="title" class="form-label">Título</label>
+      <input
+        type="text"
+        class="form-control"
+        id="title"
+        formControlName="title"
+        [ngClass]="{
+          'is-invalid': form.get('title')?.invalid && form.get('title')?.touched
+        }"
+      />
+      <div
+        *ngIf="form.get('title')?.invalid && form.get('title')?.touched"
+        class="invalid-feedback"
+      >
+        El campo título es obligatorio
+      </div>
+    </div>
 
+    <div class="mb-3">
+      <label for="description" class="form-label">Descripción</label>
+      <textarea
+        class="form-control"
+        id="description"
+        formControlName="description"
+        [ngClass]="{
+          'is-invalid':
+            form.get('description')?.invalid && form.get('description')?.touched
+        }"
+      ></textarea>
+      <div
+        *ngIf="
+          form.get('description')?.invalid && form.get('description')?.touched
+        "
+        class="invalid-feedback"
+      >
+        El campo descripción es obligatorio
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="category" class="form-label">Categoría</label>
+      <select
+        class="form-select"
+        id="category"
+        formControlName="category"
+        [ngClass]="{
+          'is-invalid':
+            form.get('category')?.invalid && form.get('category')?.touched
+        }"
+      >
+        <option value="">Seleccione una categoría</option>
+        <option *ngFor="let category of categories" [value]="category">
+          {{ category }}
+        </option>
+      </select>
+      <div
+        *ngIf="form.get('category')?.invalid && form.get('category')?.touched"
+        class="invalid-feedback"
+      >
+        El campo categoría es obligatorio
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="type" class="form-label">Tipo</label>
+      <select
+        class="form-select"
+        id="type"
+        formControlName="type"
+        [ngClass]="{
+          'is-invalid': form.get('type')?.invalid && form.get('type')?.touched
+        }"
+      >
+        <option value="">Seleccione un tipo</option>
+        <option *ngFor="let type of types" [value]="type">
+          {{ type }}
+        </option>
+      </select>
+      <div
+        *ngIf="form.get('type')?.invalid && form.get('type')?.touched"
+        class="invalid-feedback"
+      >
+        El campo tipo es obligatorio
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="animal_category" class="form-label">Categoría de animal</label>
+      <select
+        class="form-select"
+        id="animal_category"
+        formControlName="animal_category"
+        [ngClass]="{
+          'is-invalid':
+            form.get('animal_category')?.invalid &&
+            form.get('animal_category')?.touched
+        }"
+      >
+        <option value="">Seleccione una categoría de animal</option>
+        <option *ngFor="let animal of animalCategories" [value]="animal">
+          {{ animal }}
+        </option>
+      </select>
+      <div
+        *ngIf="
+          form.get('animal_category')?.invalid &&
+          form.get('animal_category')?.touched
+        "
+        class="invalid-feedback"
+      >
+        El campo categoría de animal es obligatorio
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="brand_id" class="form-label">Marca</label>
+      <select
+        class="form-select"
+        id="brand_id"
+        formControlName="brand_id"
+        [ngClass]="{
+          'is-invalid':
+            form.get('brand_id')?.invalid && form.get('brand_id')?.touched
+        }"
+      >
+        <option value="">Seleccione una marca</option>
+        <option *ngFor="let brand of brands" [value]="brand.id">
+          {{ brand.name }}
+        </option>
+      </select>
+      <div
+        *ngIf="form.get('brand_id')?.invalid && form.get('brand_id')?.touched"
+        class="invalid-feedback"
+      >
+        El campo marca es obligatorio
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Tallas</label>
+      <div formArrayName="sizes">
+        <div
+          *ngFor="let size of sizes.controls; let i = index"
+          [formGroupName]="i"
+          class="mb-2"
+        >
+          <div class="row">
+            <div class="col">
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Talla (ej. 1 Kg)"
+                formControlName="size"
+                [ngClass]="{
+                  'is-invalid':
+                    size.get('size')?.invalid && size.get('size')?.touched
+                }"
+              />
+              <div
+                *ngIf="size.get('size')?.invalid && size.get('size')?.touched"
+                class="invalid-feedback"
+              >
+                El campo talla es obligatorio
+              </div>
+            </div>
+            <div class="col">
+              <input
+                type="number"
+                class="form-control"
+                placeholder="Precio"
+                formControlName="price"
+                [ngClass]="{
+                  'is-invalid':
+                    size.get('price')?.invalid && size.get('price')?.touched
+                }"
+              />
+              <div
+                *ngIf="size.get('price')?.invalid && size.get('price')?.touched"
+                class="invalid-feedback"
+              >
+                El campo precio es obligatorio y debe ser no negativo
+              </div>
+            </div>
+            <div class="col">
+              <input
+                type="number"
+                class="form-control"
+                placeholder="Stock"
+                formControlName="stock_quantity"
+                [ngClass]="{
+                  'is-invalid':
+                    size.get('stock_quantity')?.invalid &&
+                    size.get('stock_quantity')?.touched
+                }"
+              />
+              <div
+                *ngIf="
+                  size.get('stock_quantity')?.invalid &&
+                  size.get('stock_quantity')?.touched
+                "
+                class="invalid-feedback"
+              >
+                El campo stock es obligatorio y debe ser no negativo
+              </div>
+            </div>
+            <div class="col">
+              <input
+                type="text"
+                class="form-control"
+                placeholder="URL de imagen (opcional)"
+                formControlName="image_url"
+              />
+            </div>
+            <div class="col-auto">
+              <button
+                type="button"
+                class="btn btn-danger"
+                (click)="removeSize(i)"
+              >
+                Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+        <button
+          type="button"
+          class="btn btn-secondary mt-2"
+          (click)="addSize()"
+        >
+          Agregar talla
+        </button>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <button type="submit" class="btn btn-primary me-2" [disabled]="form.invalid">
+        Aceptar
+      </button>
+      <button type="button" class="btn btn-secondary" (click)="goBack()">
+        Volver
+      </button>
+    </div>
+  </form>
+</div>

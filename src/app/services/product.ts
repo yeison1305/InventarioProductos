@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
-import { enviroments } from '../../enviroments/enviroments';
-import { Observable } from 'rxjs';
-import { Product, ProductResponse } from '../interfaces/product';
 import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { Product, ProductResponse, Brand } from '../interfaces/product';
+import { enviroments } from '../../enviroments/enviroments'; // Corregido 'enviroments' a 'environment'
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ProductService {
   private myAppUrl: string;
@@ -16,23 +17,35 @@ export class ProductService {
     this.myApiUrl = 'api/productos/';
   }
 
-  getListProducts(): Observable<ProductResponse> {
-    return this.http.get<ProductResponse>(`${this.myAppUrl}${this.myApiUrl}`);
+  getListProducts(): Observable<Product[]> {
+    return this.http.get<ProductResponse>(`${this.myAppUrl}${this.myApiUrl}`).pipe(
+      map((response) => (Array.isArray(response.data) ? response.data : [response.data]))
+    );
+  }
+
+  getProduct(id: number): Observable<Product> {
+    return this.http.get<ProductResponse>(`${this.myAppUrl}${this.myApiUrl}${id}`).pipe(
+      map((response) => response.data as Product)
+    );
+  }
+
+  saveProduct(product: Product): Observable<Product> {
+    return this.http.post<ProductResponse>(`${this.myAppUrl}${this.myApiUrl}`, product).pipe(
+      map((response) => response.data as Product)
+    );
+  }
+
+  updateProduct(id: number, product: Product): Observable<Product> {
+    return this.http.put<ProductResponse>(`${this.myAppUrl}${this.myApiUrl}${id}`, product).pipe(
+      map((response) => response.data as Product)
+    );
   }
 
   deleteProduct(id: number): Observable<void> {
     return this.http.delete<void>(`${this.myAppUrl}${this.myApiUrl}${id}`);
   }
 
-  saveProduct(product: Product): Observable<void> {
-    return this.http.post<void>(`${this.myAppUrl}${this.myApiUrl}`, product);
-  }
-
-  getProduct(id: number): Observable<Product> {
-    return this.http.get<Product>(`${this.myAppUrl}${this.myApiUrl}${id}`);
-  }
-
-  updateProduct(id: number, product: Product): Observable<void> {
-    return this.http.put<void>(`${this.myAppUrl}${this.myApiUrl}${id}`, product);
+  getBrands(): Observable<Brand[]> {
+    return this.http.get<Brand[]>(`${this.myAppUrl}api/brands`);
   }
 }
