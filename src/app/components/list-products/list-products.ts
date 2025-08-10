@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ProductService } from '../../services/product';
-import { Product, ProductSize } from '../../interfaces/product';
+import { Product, ProductSize, Image } from '../../interfaces/product'; // Ajusta la importación
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
@@ -67,7 +67,7 @@ export class ListProducts implements OnInit {
     return sizes?.map((s) => `${s.size} ($${s.price}, Stock: ${s.stock_quantity})`).join(', ') || 'Sin tallas';
   }
 
-  getFirstImageUrl(sizes?: ProductSize[]): string | null {
-    return sizes?.find(size => size.image_url)?.image_url || null;
+  getFirstImageUrl(images?: Image[]): string | null {
+    return images?.find(image => image.image_url)?.image_url || null;
   }
 }
