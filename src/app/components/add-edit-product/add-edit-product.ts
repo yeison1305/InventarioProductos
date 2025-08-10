@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormArray } from '@angular/forms';
-import { Product, ProductSize, Brand } from '../../interfaces/product';
+import { Product, ProductSize, Brand, Image } from '../../interfaces/product';
 import { ProductService } from '../../services/product';
 import { ToastrService } from 'ngx-toastr';
 
@@ -22,7 +22,7 @@ export class AddEditProduct implements OnInit {
   types: string[] = ['Food', 'Toy', 'Medicine'];
   animalCategories: string[] = ['Cat', 'Dog', 'Other'];
   brands: Brand[] = [];
-  loading: boolean = false; // Añadido estado de carga
+  loading: boolean = false;
 
   constructor(
     private router: Router,
@@ -39,10 +39,10 @@ export class AddEditProduct implements OnInit {
       animal_category: ['', Validators.required],
       brand_id: [null, Validators.required],
       sizes: this.fb.array([]),
+      images: this.fb.array([]), // Nuevo FormArray para imágenes
     });
- 
-    this.id = Number(aRouter.snapshot.paramMap.get('id'));
 
+    this.id = Number(aRouter.snapshot.paramMap.get('id'));
   }
 
   ngOnInit() {
@@ -56,7 +56,7 @@ export class AddEditProduct implements OnInit {
     });
 
     if (this.id !== 0) {
-      this.operacion = 'Editar';
+      this.operacion = 'Editar ';
       this.getProduct(this.id);
     }
   }
@@ -65,12 +65,16 @@ export class AddEditProduct implements OnInit {
     return this.form.get('sizes') as FormArray;
   }
 
+  get images(): FormArray {
+    return this.form.get('images') as FormArray;
+  }
+
   addSize(size?: ProductSize) {
     const sizeForm = this.fb.group({
       size: [size?.size || '', Validators.required],
       price: [size?.price || 0, [Validators.required, Validators.min(0)]],
       stock_quantity: [size?.stock_quantity || 0, [Validators.required, Validators.min(0)]],
-      image_url: [size?.image_url || ''],
+      image_url: [size?.image_url || ''], // Mantenido por compatibilidad, opcional
     });
     this.sizes.push(sizeForm);
   }
@@ -79,7 +83,19 @@ export class AddEditProduct implements OnInit {
     this.sizes.removeAt(index);
   }
 
+  addImage(image?: Image) {
+    const imageForm = this.fb.group({
+      image_url: [image?.image_url || '', Validators.required], // Campo obligatorio para imágenes
+    });
+    this.images.push(imageForm);
+  }
+
+  removeImage(index: number) {
+    this.images.removeAt(index);
+  }
+
   getProduct(id: number) {
+    this.loading = true;
     this.productService.getProduct(id).subscribe({
       next: (data: Product) => {
         this.form.patchValue({
@@ -92,13 +108,16 @@ export class AddEditProduct implements OnInit {
         });
         this.sizes.clear();
         data.sizes?.forEach((size) => this.addSize(size));
+        this.images.clear();
+        data.images?.forEach((image) => this.addImage(image)); // Llenado automático de URLs de imágenes
+        this.loading = false;
       },
       error: (error) => {
         console.error('Error al obtener el producto:', error);
         this.toastrService.error('Error al obtener el producto', 'Error');
+        this.loading = false;
       },
     });
-
   }
 
   goBack() {
@@ -106,7 +125,12 @@ export class AddEditProduct implements OnInit {
   }
 
   addProduct() {
-    this.loading = true; // Activar estado de carga
+    if (this.form.invalid) {
+      this.toastrService.error('Por favor, completa todos los campos requeridos', 'Error');
+      return;
+    }
+
+    this.loading = true;
     const product: Product = {
       title: this.form.value.title,
       description: this.form.value.description,
@@ -115,6 +139,7 @@ export class AddEditProduct implements OnInit {
       animal_category: this.form.value.animal_category,
       brand_id: this.form.value.brand_id,
       sizes: this.form.value.sizes,
+      images: this.form.value.images.map((img: any) => ({ image_url: img.image_url })),
     };
 
     if (this.id !== 0) {
@@ -122,29 +147,28 @@ export class AddEditProduct implements OnInit {
       this.productService.updateProduct(this.id, product).subscribe({
         next: () => {
           this.toastrService.success('Producto actualizado con éxito', 'Éxito');
-          this.loading = false; // Desactivar estado de carga
+          this.loading = false;
           this.router.navigate(['/']);
         },
         error: (error) => {
           this.toastrService.error('Error al actualizar el producto', 'Error');
-          this.loading = false; // Desactivar estado de carga en caso de error
+          this.loading = false;
         },
       });
     } else {
       this.productService.saveProduct(product).subscribe({
         next: () => {
           this.toastrService.success('Producto guardado con éxito', 'Éxito');
-          this.loading = false; // Desactivar estado de carga
-          // Forzar recarga de la lista
+          this.loading = false;
           setTimeout(() => {
             this.router.navigate(['/']).then(() => {
-              window.location.reload(); // Recargar página para reflejar el nuevo producto
+              window.location.reload();
             });
           }, 100);
         },
         error: (error) => {
           this.toastrService.error('Error al guardar el producto', 'Error');
-          this.loading = false; // Desactivar estado de carga en caso de error
+          this.loading = false;
         },
       });
     }

@@ -206,15 +206,7 @@
               >
                 El campo stock es obligatorio y debe ser no negativo
               </div>
-            </div>
-            <div class="col">
-              <input
-                type="text"
-                class="form-control"
-                placeholder="URL de imagen (opcional)"
-                formControlName="image_url"
-              />
-            </div>
+            </div>            
             <div class="col-auto">
               <button
                 type="button"
@@ -236,9 +228,66 @@
       </div>
     </div>
 
+    <!-- Nueva sección para Imágenes -->
     <div class="mb-3">
-      <button type="submit" class="btn btn-primary me-2" [disabled]="form.invalid">
-        Aceptar
+      <label class="form-label">Imágenes</label>
+      <div formArrayName="images">
+        <div
+          *ngFor="let image of images.controls; let i = index"
+          [formGroupName]="i"
+          class="mb-2"
+        >
+          <div class="row align-items-center">
+            <div class="col">
+              <input
+                type="text"
+                class="form-control"
+                placeholder="URL de la imagen"
+                formControlName="image_url"
+                [ngClass]="{
+                  'is-invalid':
+                    image.get('image_url')?.invalid && image.get('image_url')?.touched
+                }"
+              />
+              <div
+                *ngIf="image.get('image_url')?.invalid && image.get('image_url')?.touched"
+                class="invalid-feedback"
+              >
+                El campo URL de la imagen es obligatorio
+              </div>
+            </div>
+            <div class="col-auto">
+              <img
+                [src]="image.get('image_url')?.value"
+                alt="Previsualización"
+                class="preview-image"
+                *ngIf="image.get('image_url')?.value"
+              />
+            </div>
+            <div class="col-auto">
+              <button
+                type="button"
+                class="btn btn-danger"
+                (click)="removeImage(i)"
+              >
+                Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+        <button
+          type="button"
+          class="btn btn-secondary mt-2"
+          (click)="addImage()"
+        >
+          Agregar imagen
+        </button>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <button type="submit" class="btn btn-primary me-2" [disabled]="form.invalid || loading">
+        {{ loading ? 'Guardando...' : 'Aceptar' }}
       </button>
       <button type="button" class="btn btn-secondary" (click)="goBack()">
         Volver
@@ -246,3 +295,14 @@
     </div>
   </form>
 </div>
+
+<style>
+  .preview-image {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-left: 10px;
+  }
+</style>
