@@ -11,6 +11,8 @@ export interface Product {
   images?: Image[]; // Nuevo campo para imágenes
   brand?: Brand;
   rating?: Rating | null;
+  is_active?: boolean;  
+  selected?: boolean;
 }
 
 export interface ProductSize {

@@ -4,17 +4,19 @@ import { RouterModule } from '@angular/router';
 import { ProductService } from '../../services/product';
 import { Product, ProductSize, Image } from '../../interfaces/product'; // Ajusta la importación
 import { ToastrService } from 'ngx-toastr';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-list-products',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './list-products.html',
   styleUrls: ['./list-products.css'],
 })
 export class ListProducts implements OnInit {
   listProducts: Product[] = [];
   loading: boolean = false;
+  selectAll: boolean = false;
 
   constructor(
     private _productService: ProductService,
@@ -31,9 +33,7 @@ export class ListProducts implements OnInit {
     console.log('Iniciando carga de productos, loading:', this.loading);
     this._productService.getListProducts().subscribe({
       next: (data: Product[]) => {
-        this.listProducts = [...data];
-        console.log('Productos:', this.listProducts);
-        console.log('listProducts después de asignar:', this.listProducts);
+        this.listProducts = data.map(p => ({ ...p, selected: false }));
         this.loading = false;
         this.cdr.detectChanges();
       },
@@ -43,6 +43,26 @@ export class ListProducts implements OnInit {
         this.loading = false;
         this.cdr.detectChanges();
       },
+    });
+  }
+
+  toggleSelectAll() {
+    this.listProducts.forEach(p => (p.selected = this.selectAll));
+  }
+
+  checkIfAllSelected() {
+    this.selectAll = this.listProducts.every(p => p.selected);
+  }
+
+  toggleActive(product: Product) {
+    this._productService.updateProduct(product.id!, { is_active: product.is_active }).subscribe({
+      next: () => {
+        this.toastr.success(`Producto ${product.is_active ? 'activado' : 'desactivado'}`);
+      },
+      error: () => {
+        this.toastr.error('Error al actualizar estado del producto');
+        product.is_active = !product.is_active; // revertir cambio si falla
+      }
     });
   }
 

@@ -3,38 +3,47 @@
   <a [routerLink]="['/add']" class="btn btn-primary mb-3">Agregar producto</a>
 
   <table class="table table-striped" *ngIf="listProducts.length > 0 && !loading">
-    <thead>
-      <tr>
-        <th>Imagen</th>
-        <th>Título</th>
-        <th>Descripción</th>
-        <th>Categoría</th>
-        <th>Tipo</th>
-        <th>Categoría de animal</th>
-        <th>Marca</th>
-        <th>Tallas</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let item of listProducts">
-        <td>
-          <img [src]="getFirstImageUrl(item.images)" alt="{{ item.title }}" class="product-thumbnail" *ngIf="getFirstImageUrl(item.images)">
-        </td>
-        <td>{{ item.title }}</td>
-        <td>{{ item.description }}</td>
-        <td>{{ item.category }}</td>
-        <td>{{ item.type }}</td>
-        <td>{{ item.animal_category }}</td>
-        <td>{{ item.brand?.name || 'Sin marca' }}</td>
-        <td>{{ getSizesText(item.sizes) }}</td>
-        <td>
-          <a [routerLink]="['/edit', item.id]" class="btn btn-primary btn-sm me-2">edit</a>
-          <button (click)="deleteProduct(item.id!)" class="btn btn-danger btn-sm">delete</button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <thead>
+    <tr>
+      <th>Imagen</th>
+      <th>Título</th>
+      <th>Descripción</th>
+      <th>Categoría</th>
+      <th>Tipo</th>
+      <th>Categoría de animal</th>
+      <th>Marca</th>
+      <th>Tallas</th>
+      <th>Activo</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let item of listProducts">
+      <td>
+        <img [src]="getFirstImageUrl(item.images)" alt="{{ item.title }}" class="product-thumbnail" *ngIf="getFirstImageUrl(item.images)">
+      </td>
+      <td>{{ item.title }}</td>
+      <td>{{ item.description }}</td>
+      <td>{{ item.category }}</td>
+      <td>{{ item.type }}</td>
+      <td>{{ item.animal_category }}</td>
+      <td>{{ item.brand?.name || 'Sin marca' }}</td>
+      <td>{{ getSizesText(item.sizes) }}</td>
+      <td>
+        <a [routerLink]="['/edit', item.id]" class="btn btn-primary btn-sm me-2">edit</a>
+        <button (click)="deleteProduct(item.id!)" class="btn btn-danger btn-sm">delete</button>
+      </td>
+      <td>
+        <input 
+          type="checkbox" 
+          [(ngModel)]="item.is_active" 
+          (change)="toggleActive(item)" 
+        />
+      </td>
+    </tr>
+  </tbody>
+</table>
+
 
   <div *ngIf="listProducts.length === 0 && !loading" class="alert alert-info">
     No hay productos para mostrar

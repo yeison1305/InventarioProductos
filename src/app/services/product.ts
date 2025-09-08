@@ -35,7 +35,7 @@ export class ProductService {
     );
   }
 
-  updateProduct(id: number, product: Product): Observable<Product> {
+  updateProduct(id: number, product: Partial<Product>): Observable<Product> {
     return this.http.put<ProductResponse>(`${this.myAppUrl}${this.myApiUrl}${id}`, product).pipe(
       map((response) => response.data as Product)
     );
