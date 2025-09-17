@@ -3,59 +3,65 @@
   <a [routerLink]="['/add']" class="btn btn-primary mb-3">Agregar producto</a>
 
   <table class="table table-striped" *ngIf="listProducts.length > 0 && !loading">
-  <thead>
-    <tr>
-      <th>Imagen</th>
-      <th>Título</th>
-      <th>Descripción</th>
-      <th>Categoría</th>
-      <th>Tipo</th>
-      <th>Categoría de animal</th>
-      <th>Marca</th>
-      <th>Tallas</th>
-      <th>Activo</th>
-      <th>Acciones</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let item of listProducts">
-      <td>
-        <img [src]="getFirstImageUrl(item.images)" alt="{{ item.title }}" class="product-thumbnail" *ngIf="getFirstImageUrl(item.images)">
-      </td>
-      <td>{{ item.title }}</td>
-      <td>{{ item.description }}</td>
-      <td>{{ item.category }}</td>
-      <td>{{ item.type }}</td>
-      <td>{{ item.animal_category }}</td>
-      <td>{{ item.brand?.name || 'Sin marca' }}</td>
-      <td>{{ getSizesText(item.sizes) }}</td>
-      <td>
-        <a [routerLink]="['/edit', item.id]" class="btn btn-primary btn-sm me-2">edit</a>
-        <button (click)="deleteProduct(item.id!)" class="btn btn-danger btn-sm">delete</button>
-      </td>
-      <td>
-        <input 
-          type="checkbox" 
-          [(ngModel)]="item.is_active" 
-          (change)="toggleActive(item)" 
-        />
-      </td>
-    </tr>
-  </tbody>
-</table>
-
+    <thead>
+      <tr>
+        <th>Imagen</th>
+        <th>Título</th>
+        <th>Descripción</th>
+        <th>Categoría</th>
+        <th>Tipo</th>
+        <th>Categoría de animal</th>
+        <th>Marca</th>
+        <th>Tallas</th>
+        <th>Activo</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of listProducts">
+        <td>
+          <img [src]="getFirstImageUrl(item.images)" alt="{{ item.title }}" class="product-thumbnail" *ngIf="getFirstImageUrl(item.images)">
+        </td>
+        <td>{{ item.title }}</td>
+        <td>{{ item.description }}</td>
+        <td>{{ item.category }}</td>
+        <td>{{ item.type }}</td>
+        <td>{{ item.animal_category }}</td>
+        <td>{{ item.brand?.name || 'Sin marca' }}</td>
+        <td>
+          <ng-container *ngIf="item.sizes && item.sizes.length > 0 && item.id; else noSizes">
+            <div *ngFor="let size of item.sizes; let i = index" class="size-row">
+              {{ size.size }}: 
+              <input 
+                type="number" 
+                [(ngModel)]="size.price" 
+                (blur)="updatePrice(item.id, size.size, size.price, i)" 
+                class="form-control form-control-sm" 
+                min="0" 
+                step="0.01"
+              />
+              (Stock: {{ size.stock_quantity }})
+            </div>
+          </ng-container>
+          <ng-template #noSizes>Sin tallas</ng-template>
+        </td>
+        <td>
+          <input 
+            type="checkbox" 
+            [(ngModel)]="item.is_active" 
+            (change)="toggleActive(item)" 
+          />
+        </td>
+        <td>
+          <a [routerLink]="['/edit', item.id]" class="btn btn-primary btn-sm me-2" *ngIf="item.id">edit</a>
+          <button (click)="deleteProduct(item.id!)" class="btn btn-danger btn-sm" *ngIf="item.id">delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 
   <div *ngIf="listProducts.length === 0 && !loading" class="alert alert-info">
     No hay productos para mostrar
   </div>
   <div *ngIf="loading" class="alert alert-info">Cargando...</div>
 </div>
-
-<style>
-  .product-thumbnail {
-    width: 130px;
-    height: 130px;
-    object-fit: cover;
-    border-radius: 5px;
-  }
-</style>

@@ -8,10 +8,10 @@ export interface Product {
   brand_id: number;
   created_at?: string;
   sizes?: ProductSize[];
-  images?: Image[]; // Nuevo campo para imágenes
+  images?: Image[];
   brand?: Brand;
   rating?: Rating | null;
-  is_active?: boolean;  
+  is_active?: boolean;
   selected?: boolean;
 }
 
@@ -21,7 +21,7 @@ export interface ProductSize {
   size: string;
   price: number;
   stock_quantity: number;
-  image_url?: string | null; // Mantenido por compatibilidad, pero ahora opcional
+  image_url?: string | null;
   catalog_product_id?: string | null;
   is_free?: boolean;
 }

@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ProductService } from '../../services/product';
-import { Product, ProductSize, Image } from '../../interfaces/product'; // Ajusta la importación
+import { Product, ProductSize, Image } from '../../interfaces/product';
 import { ToastrService } from 'ngx-toastr';
 import { FormsModule } from '@angular/forms';
 
@@ -81,6 +81,49 @@ export class ListProducts implements OnInit {
         },
       });
     }
+  }
+
+  updatePrice(productId: number, size: string, newPrice: number, sizeIndex: number) {
+    const product = this.listProducts.find(p => p.id === productId);
+    if (!product) {
+      this.toastr.error('Producto no encontrado', 'Error');
+      return;
+    }
+
+    // Verificar si sizes está definido
+    if (!product.sizes || product.sizes.length === 0) {
+      this.toastr.error('El producto no tiene tallas definidas', 'Error');
+      return;
+    }
+
+    // Crear una copia del array de tallas
+    const updatedSizes = [...product.sizes];
+    if (sizeIndex >= updatedSizes.length) {
+      this.toastr.error('Índice de talla inválido', 'Error');
+      return;
+    }
+
+    // Guardar el precio original para revertir en caso de error
+    const originalPrice = updatedSizes[sizeIndex].price;
+    updatedSizes[sizeIndex] = { ...updatedSizes[sizeIndex], price: newPrice };
+
+    // Enviar la actualización al servidor
+    this._productService.updateProduct(productId, { sizes: updatedSizes }).subscribe({
+      next: (updatedProduct) => {
+        // Actualizar la lista localmente con la respuesta del servidor
+        product.sizes = updatedProduct.sizes;
+        this.toastr.success(`Precio de la talla ${size} actualizado a $${newPrice}`);
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error al actualizar precio:', err);
+        this.toastr.error('Error al actualizar el precio', 'Error');
+        // Revertir el cambio local si falla
+        updatedSizes[sizeIndex].price = originalPrice;
+        product.sizes = updatedSizes;
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   getSizesText(sizes?: ProductSize[]): string {

@@ -1,5 +1,25 @@
+.product-thumbnail {
+  width: 130px;
+  height: 130px;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
 .title {
-    margin-top: 10px;
-    display: flex;
-    justify-content: space-between;
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.table .form-control-sm {
+  display: inline-block;
+  width: 100px;
+  margin-right: 10px;
+}
+
+.table .size-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 5px;
 }
