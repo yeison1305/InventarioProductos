@@ -24,9 +24,42 @@
         </td>
         <td>{{ item.title }}</td>
         <td>{{ item.description }}</td>
-        <td>{{ item.category }}</td>
-        <td>{{ item.type }}</td>
-        <td>{{ item.animal_category }}</td>
+        <td>
+          <select 
+            class="form-select form-select-sm" 
+            [(ngModel)]="item.category" 
+            (ngModelChange)="updateField(item.id!, 'category', $event)"
+            [ngClass]="{'is-invalid': !item.category}"
+            [disabled]="item.updating ?? false"
+          >
+            <option value="">Seleccione una categoría</option>
+            <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
+          </select>
+        </td>
+        <td>
+          <select 
+            class="form-select form-select-sm" 
+            [(ngModel)]="item.type" 
+            (ngModelChange)="updateField(item.id!, 'type', $event)"
+            [ngClass]="{'is-invalid': !item.type}"
+            [disabled]="item.updating ?? false"
+          >
+            <option value="">Seleccione un tipo</option>
+            <option *ngFor="let type of types" [value]="type">{{ type }}</option>
+          </select>
+        </td>
+        <td>
+          <select 
+            class="form-select form-select-sm" 
+            [(ngModel)]="item.animal_category" 
+            (ngModelChange)="updateField(item.id!, 'animal_category', $event)"
+            [ngClass]="{'is-invalid': !item.animal_category}"
+            [disabled]="item.updating ?? false"
+          >
+            <option value="">Seleccione una categoría de animal</option>
+            <option *ngFor="let animal of animalCategories" [value]="animal">{{ animal }}</option>
+          </select>
+        </td>
         <td>{{ item.brand?.name || 'Sin marca' }}</td>
         <td>
           <ng-container *ngIf="item.sizes && item.sizes.length > 0 && item.id; else noSizes">
@@ -39,6 +72,7 @@
                 class="form-control form-control-sm" 
                 min="0" 
                 step="0.01"
+                [disabled]="item.updating ?? false"
               />
               (Stock: {{ size.stock_quantity }})
             </div>
@@ -50,6 +84,7 @@
             type="checkbox" 
             [(ngModel)]="item.is_active" 
             (change)="toggleActive(item)" 
+            [disabled]="item.updating ?? false"
           />
         </td>
         <td>

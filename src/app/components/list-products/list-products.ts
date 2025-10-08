@@ -14,9 +14,19 @@ import { FormsModule } from '@angular/forms';
   styleUrls: ['./list-products.css'],
 })
 export class ListProducts implements OnInit {
-  listProducts: Product[] = [];
+  listProducts: (Product & { updating?: boolean })[] = [];
   loading: boolean = false;
   selectAll: boolean = false;
+  categories: string[] = [
+    'Alimentos Secos',
+    'Alimentos Húmedos',
+    'Snacks',
+    'Arena para Gatos',
+    'Accesorios',
+    'Productos Veterinarios'
+  ];
+  types: string[] = ['Alimentos', 'Arena', 'Snack', 'Juguete', 'Accesorio', 'Cuidado'];
+  animalCategories: string[] = ['Gato', 'Perro', 'Hamster', 'Pájaro', 'Caballo', 'Vaca'];
 
   constructor(
     private _productService: ProductService,
@@ -33,7 +43,8 @@ export class ListProducts implements OnInit {
     console.log('Iniciando carga de productos, loading:', this.loading);
     this._productService.getListProducts().subscribe({
       next: (data: Product[]) => {
-        this.listProducts = data.map(p => ({ ...p, selected: false }));
+        this.listProducts = data.map(p => ({ ...p, selected: false, updating: false }));
+        this.validateFields();
         this.loading = false;
         this.cdr.detectChanges();
       },
@@ -46,6 +57,23 @@ export class ListProducts implements OnInit {
     });
   }
 
+  validateFields() {
+    this.listProducts.forEach(product => {
+      if (!this.categories.includes(product.category)) {
+        console.warn(`Categoría inválida para el producto ${product.id}: ${product.category}`);
+        product.category = '';
+      }
+      if (!this.types.includes(product.type)) {
+        console.warn(`Tipo inválido para el producto ${product.id}: ${product.type}`);
+        product.type = '';
+      }
+      if (!this.animalCategories.includes(product.animal_category)) {
+        console.warn(`Categoría de animal inválida para el producto ${product.id}: ${product.animal_category}`);
+        product.animal_category = '';
+      }
+    });
+  }
+
   toggleSelectAll() {
     this.listProducts.forEach(p => (p.selected = this.selectAll));
   }
@@ -54,14 +82,20 @@ export class ListProducts implements OnInit {
     this.selectAll = this.listProducts.every(p => p.selected);
   }
 
-  toggleActive(product: Product) {
+  toggleActive(product: Product & { updating?: boolean }) {
+    product.updating = true;
+    this.cdr.detectChanges();
     this._productService.updateProduct(product.id!, { is_active: product.is_active }).subscribe({
       next: () => {
         this.toastr.success(`Producto ${product.is_active ? 'activado' : 'desactivado'}`);
+        product.updating = false;
+        this.cdr.detectChanges();
       },
       error: () => {
         this.toastr.error('Error al actualizar estado del producto');
-        product.is_active = !product.is_active; // revertir cambio si falla
+        product.is_active = !product.is_active; // Revertir cambio si falla
+        product.updating = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -90,37 +124,79 @@ export class ListProducts implements OnInit {
       return;
     }
 
-    // Verificar si sizes está definido
     if (!product.sizes || product.sizes.length === 0) {
       this.toastr.error('El producto no tiene tallas definidas', 'Error');
       return;
     }
 
-    // Crear una copia del array de tallas
     const updatedSizes = [...product.sizes];
     if (sizeIndex >= updatedSizes.length) {
       this.toastr.error('Índice de talla inválido', 'Error');
       return;
     }
 
-    // Guardar el precio original para revertir en caso de error
     const originalPrice = updatedSizes[sizeIndex].price;
     updatedSizes[sizeIndex] = { ...updatedSizes[sizeIndex], price: newPrice };
+    product.updating = true;
+    this.cdr.detectChanges();
 
-    // Enviar la actualización al servidor
     this._productService.updateProduct(productId, { sizes: updatedSizes }).subscribe({
       next: (updatedProduct) => {
-        // Actualizar la lista localmente con la respuesta del servidor
         product.sizes = updatedProduct.sizes;
         this.toastr.success(`Precio de la talla ${size} actualizado a $${newPrice}`);
+        product.updating = false;
         this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Error al actualizar precio:', err);
         this.toastr.error('Error al actualizar el precio', 'Error');
-        // Revertir el cambio local si falla
         updatedSizes[sizeIndex].price = originalPrice;
         product.sizes = updatedSizes;
+        product.updating = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  updateField(productId: number, field: 'category' | 'type' | 'animal_category', value: string) {
+    const product = this.listProducts.find(p => p.id === productId);
+    if (!product) {
+      this.toastr.error('Producto no encontrado', 'Error');
+      return;
+    }
+
+    // Validar que el valor esté en la lista correspondiente
+    const validLists: { [key: string]: string[] } = {
+      category: this.categories,
+      type: this.types,
+      animal_category: this.animalCategories,
+    };
+    if (!validLists[field].includes(value) && value !== '') {
+      this.toastr.error(`Valor inválido para ${field}`, 'Error');
+      return;
+    }
+
+    // Guardar el valor original para revertir en caso de error
+    const originalValue = product[field];
+    product[field] = value;
+    product.updating = true;
+    this.cdr.detectChanges();
+
+    // Crear el objeto de actualización solo con el campo modificado
+    const updateData: Partial<Product> = { [field]: value };
+
+    this._productService.updateProduct(productId, updateData).subscribe({
+      next: (updatedProduct) => {
+        product[field] = updatedProduct[field];
+        this.toastr.success(`Campo ${field} actualizado correctamente`);
+        product.updating = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error(`Error al actualizar ${field}:`, err);
+        this.toastr.error(`Error al actualizar el campo ${field}`, 'Error');
+        product[field] = originalValue;
+        product.updating = false;
         this.cdr.detectChanges();
       }
     });

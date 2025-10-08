@@ -1,25 +1,153 @@
+/* Estilo para la miniatura de la imagen del producto */
 .product-thumbnail {
-  width: 130px;
-  height: 130px;
+  width: 100px; /* Reducido para optimizar espacio */
+  height: 100px;
   object-fit: cover;
   border-radius: 5px;
+  border: 1px solid #dee2e6; /* Borde sutil para mejor definición */
 }
 
+/* Estilo para el título de la página */
 .title {
   margin-top: 10px;
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  padding-bottom: 10px;
 }
 
+/* Estilo para los inputs numéricos en la columna de tallas */
 .table .form-control-sm {
   display: inline-block;
-  width: 100px;
-  margin-right: 10px;
+  width: 80px; /* Ancho más compacto */
+  height: 30px; /* Altura consistente con los dropdowns */
+  padding: 4px 8px;
+  font-size: 0.875rem; /* Tamaño de fuente más pequeño */
+  border-radius: 4px;
+  vertical-align: middle; /* Alineación vertical */
 }
 
+/* Estilo para los dropdowns */
+.table .form-select-sm {
+  display: inline-block;
+  width: 120px; /* Ancho optimizado para el contenido */
+  height: 30px; /* Altura consistente con inputs */
+  padding: 4px 8px;
+  font-size: 0.875rem;
+  border-radius: 4px;
+  vertical-align: middle; /* Alineación vertical */
+}
+
+/* Estilo para campos inválidos */
+.table .is-invalid {
+  border-color: #dc3545; /* Borde rojo más visible */
+  background-color: #fff5f5; /* Fondo rojo claro para destacar */
+}
+
+/* Estilo para elementos deshabilitados */
+.table .form-select-sm:disabled,
+.table .form-control-sm:disabled,
+.table input[type="checkbox"]:disabled {
+  background-color: #f1f3f5; /* Fondo gris claro */
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Estilo para la fila de tallas */
 .table .size-row {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 5px;
+  gap: 8px; /* Espaciado más compacto */
+  margin-bottom: 6px;
+  font-size: 0.875rem; /* Texto más pequeño para consistencia */
+}
+
+/* Estilo para los botones de acción (edit/delete) */
+.table .btn-sm {
+  padding: 4px 8px; /* Botones más compactos */
+  font-size: 0.85rem;
+  border-radius: 4px;
+  transition: background-color 0.2s ease; /* Transición suave para hover */
+}
+
+.table .btn-primary:hover {
+  background-color: #005f73; /* Color más oscuro en hover */
+}
+
+.table .btn-danger:hover {
+  background-color: #c82333; /* Color más oscuro en hover */
+}
+
+/* Ajustar el espaciado de las celdas de la tabla */
+.table td, .table th {
+  vertical-align: middle; /* Centrar verticalmente todo el contenido */
+  padding: 8px; /* Padding más compacto */
+}
+
+/* Estilo para la tabla en general */
+.table {
+  border-collapse: separate;
+  border-spacing: 0;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Sombra sutil para profundidad */
+}
+
+/* Estilo para el checkbox */
+.table input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  margin: 0 auto;
+  display: block; /* Centrar el checkbox */
+}
+
+/* Responsividad para pantallas pequeñas */
+@media (max-width: 768px) {
+  .table {
+    font-size: 0.85rem; /* Reducir tamaño de fuente */
+  }
+
+  .product-thumbnail {
+    width: 60px; /* Imagen más pequeña */
+    height: 60px;
+  }
+
+  .table .form-select-sm {
+    width: 100px; /* Reducir ancho de dropdowns */
+  }
+
+  .table .form-control-sm {
+    width: 60px; /* Reducir ancho de inputs */
+  }
+
+  .table .btn-sm {
+    padding: 3px 6px; /* Botones más pequeños */
+    font-size: 0.75rem;
+  }
+
+  .table .size-row {
+    flex-direction: column; /* Apilar tallas en pantallas pequeñas */
+    align-items: flex-start;
+    gap: 4px;
+  }
+}
+
+/* Mejorar el contenedor principal */
+.container {
+  max-width: 1200px; /* Limitar el ancho máximo */
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Estilo para el botón de agregar producto */
+.btn-primary.mb-3 {
+  background-color: #0a9396; /* Color principal */
+  border-color: #0a9396;
+  padding: 8px 16px;
+  font-size: 1rem;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.btn-primary.mb-3:hover {
+  background-color: #087f85; /* Color más oscuro en hover */
 }

@@ -18,9 +18,16 @@ export class AddEditProduct implements OnInit {
   form: FormGroup;
   id: number;
   operacion: string = 'Agregar ';
-  categories: string[] = ['Pet Food', 'Accessories', 'Health'];
-  types: string[] = ['Food', 'Toy', 'Medicine'];
-  animalCategories: string[] = ['Cat', 'Dog', 'Other'];
+  categories: string[] = [
+    'Alimentos Secos',
+    'Alimentos Húmedos',
+    'Snacks',
+    'Arena para Gatos',
+    'Accesorios',
+    'Productos Veterinarios'
+  ];
+  types: string[] = ['Alimentos', 'Snack', 'Arena', 'Juguete', 'Accesorio', 'Cuidado'];
+  animalCategories: string[] = ['Gato', 'Perro', 'Hamster', 'Pájaro', 'Caballo', 'Vaca'];
   brands: Brand[] = [];
   loading: boolean = false;
 
@@ -39,7 +46,7 @@ export class AddEditProduct implements OnInit {
       animal_category: ['', Validators.required],
       brand_id: [null, Validators.required],
       sizes: this.fb.array([]),
-      images: this.fb.array([]), // Nuevo FormArray para imágenes
+      images: this.fb.array([]),
     });
 
     this.id = Number(aRouter.snapshot.paramMap.get('id'));
@@ -85,7 +92,7 @@ export class AddEditProduct implements OnInit {
 
   addImage(image?: Image) {
     const imageForm = this.fb.group({
-      image_url: [image?.image_url || '', Validators.required], // Campo obligatorio para imágenes
+      image_url: [image?.image_url || '', Validators.required],
     });
     this.images.push(imageForm);
   }
@@ -101,15 +108,15 @@ export class AddEditProduct implements OnInit {
         this.form.patchValue({
           title: data.title,
           description: data.description,
-          category: data.category,
-          type: data.type,
-          animal_category: data.animal_category,
+          category: this.categories.includes(data.category) ? data.category : '',
+          type: this.types.includes(data.type) ? data.type : '',
+          animal_category: this.animalCategories.includes(data.animal_category) ? data.animal_category : '',
           brand_id: data.brand_id,
         });
         this.sizes.clear();
         data.sizes?.forEach((size) => this.addSize(size));
         this.images.clear();
-        data.images?.forEach((image) => this.addImage(image)); // Llenado automático de URLs de imágenes
+        data.images?.forEach((image) => this.addImage(image));
         this.loading = false;
       },
       error: (error) => {
